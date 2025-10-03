@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  oxidized:
+    image: oxidized/oxidized:latest
+    restart: unless-stopped
+    env_file:
+      - ./config/secrets.env
+    environment:
+      OXIDIZED_REPO_PATH: /var/lib/oxidized/repo
+    ports:
+      - "${OXIDIZED_WEB_PORT:-8888}:8888"
+    volumes:
+      - ./config/oxidized:/home/oxidized/.config/oxidized
+      - ./data/repo:/var/lib/oxidized/repo
+      - ./scripts:/opt/oxidized-hooks:ro
+    command: ["oxidized", "--config", "/home/oxidized/.config/oxidized/config"]

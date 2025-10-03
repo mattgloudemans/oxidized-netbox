@@ -1,0 +1,57 @@
+---
+# Global credentials provided via environment for SSH access
+username: <%= ENV.fetch('OXIDIZED_SSH_USERNAME', 'set-me') %>
+password: <%= ENV.fetch('OXIDIZED_SSH_PASSWORD', 'set-me') %>
+model: junos
+resolve_dns: true
+interval: 3600
+use_syslog: false
+debug: false
+threads: 30
+timeout: 20
+retries: 3
+rest: 0.0.0.0:8888
+web: 0.0.0.0:8888
+
+vars:
+  enable: <%= ENV['OXIDIZED_ENABLE_PASSWORD'] %>
+
+groups: {}
+models: {}
+
+input:
+  default: ssh
+  debug: false
+  ssh:
+    secure: false
+    auth_methods: ["password", "keyboard-interactive"]
+
+output:
+  default: git
+  git:
+    user: <%= ENV.fetch('OXIDIZED_GIT_USER', 'oxidized') %>
+    email: <%= ENV.fetch('OXIDIZED_GIT_EMAIL', 'oxidized@example.com') %>
+    repo: <%= ENV.fetch('OXIDIZED_REPO_PATH', '/var/lib/oxidized/repo') %>
+    single_repo: true
+
+source:
+  default: csv
+  csv:
+    file: /home/oxidized/.config/oxidized/router.db
+    delimiter: !ruby/regexp /:/
+    map:
+      name: 0
+      ip: 1
+    vars_map:
+      ssh_port: 2
+
+model_map:
+  cisco: ios
+  juniper: junos
+
+hooks:
+  git_push:
+    type: exec
+    events: [post_store]
+    cmd: /opt/oxidized-hooks/git-sync.sh
+    async: true

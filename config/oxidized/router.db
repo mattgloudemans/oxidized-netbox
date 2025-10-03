@@ -1,0 +1,3 @@
+# name:ip:ssh_port
+# ams1leaf01 uses DNS for management access and default SSH port
+ams1leaf01.mgmt.cloudnet.services:ams1leaf01.mgmt.cloudnet.services:22
